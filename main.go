@@ -33,11 +33,13 @@ func updateDeviceAttr(deviceName string, attrName string, value string) {
 				ch, err := vdev.WriteDataWait(pVitotrol, attrId, value)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "WriteData error: %s\n", err)
-					os.Exit(1)
+
+					delayedShutdown()
 				}
 				if err = <-ch; err != nil {
 					fmt.Fprintf(os.Stderr, "WriteData failed: %s\n", err)
-					os.Exit(1)
+
+					delayedShutdown()
 				}
 				// update MQTT with the new value
 				token := mqttClient.Publish(pConf.MQTT.Topic+"/"+vdev.DeviceName+"/"+attrName, 0, false, value)
@@ -71,7 +73,8 @@ var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 	fmt.Printf("MQTT Connect lost: %v", err)
-	os.Exit(1)
+
+	delayedShutdown()
 }
 
 func VitotrolInit() {
@@ -80,18 +83,21 @@ func VitotrolInit() {
 	err := pVitotrol.Login(pConf.Vitotrol.Login, pConf.Vitotrol.Password)
 	if err != nil {
 		err = fmt.Errorf("Login failed: %s", err)
-		os.Exit(1)
+
+		delayedShutdown()
 
 	}
 	fmt.Println("Vitotrol GetDevices...")
 	err = pVitotrol.GetDevices()
 	if err != nil {
 		err = fmt.Errorf("GetDevices failed: %s", err)
-		os.Exit(1)
+
+		delayedShutdown()
 	}
 	if len(pVitotrol.Devices) == 0 {
 		err = fmt.Errorf("No device found")
-		os.Exit(1)
+
+		delayedShutdown()
 
 	}
 	fmt.Printf("%d device(s) found\n", len(pVitotrol.Devices))
@@ -112,17 +118,18 @@ func refreshDevice(device *vitotrol.Device, attrs []vitotrol.AttrID) bool {
 	ch, err := device.RefreshDataWait(pVitotrol, attrs)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "RefreshData error: %s\n", err)
-		os.Exit(1)
+
+		delayedShutdown()
 	}
 	if err = <-ch; err != nil {
 		fmt.Fprintf(os.Stderr, "RefreshData failed: %s\n", err)
-		os.Exit(1)
+		delayedShutdown()
 	}
 
 	err = device.GetData(pVitotrol, attrs)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "GetData error: %s\n", err)
-		os.Exit(1)
+		delayedShutdown()
 	}
 
 	fields := map[string]interface{}{}
@@ -155,7 +162,7 @@ func refreshDevices() {
 			} else {
 				// Device is not connect - retry.
 				fmt.Fprintf(os.Stderr, "Device is not connected `%s'\n", device.DeviceName)
-				os.Exit(1)
+				delayedShutdown()
 			}
 		}
 	}
@@ -185,7 +192,7 @@ func resolveFields() {
 					m := customAttrRegEx.FindStringSubmatch(fieldName)
 					if m == nil {
 						fmt.Fprintf(os.Stderr, "Unknown attribute `%s'\n", fieldName)
-						os.Exit(1)
+						delayedShutdown()
 					}
 
 					tmpName := m[1]
@@ -216,7 +223,7 @@ func resolveFields() {
 		if len(attrs) == 0 {
 			fmt.Fprintf(os.Stderr, "No attributes for device %s/location %s\n",
 				configDevice.Name, configDevice.Location)
-			os.Exit(1)
+			delayedShutdown()
 		}
 
 		configDevice.attrs = make([]vitotrol.AttrID, 0, len(attrs))
@@ -263,14 +270,16 @@ func main() {
 
 	if *configFile == "" {
 		fmt.Fprintln(os.Stderr, "config file is missing")
-		os.Exit(1)
+		delayedShutdown()
 	}
 	conf, err := ReadConfig(*configFile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Cannot read config: %s\n", err)
-		os.Exit(1)
+		delayedShutdown()
 	}
 	pConf = conf
+
+	fmt.Fprintf(os.Stdout, "Refresh interval: %ds\nRestart delay: %ds\n", pConf.Vitotrol.Frequency, pConf.Vitotrol.RetryTimeout)
 
 	// Resolve fields
 	resolveFields()
@@ -279,4 +288,9 @@ func main() {
 	initializeMQTTClient()
 
 	mainLoop()
+}
+
+func delayedShutdown() {
+	time.Sleep(time.Duration(pConf.Vitotrol.RetryTimeout) * time.Second)
+	os.Exit(1)
 }

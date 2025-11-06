@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/maxatome/go-vitotrol"
+	"github.com/benvanmierloo/go-vitotrol"
 )
 
 // ComputedAttr describes a custom attribute that is computed using

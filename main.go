@@ -11,7 +11,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/maxatome/go-vitotrol"
+	"github.com/benvanmierloo/go-vitotrol"
 )
 
 var pConf *Config

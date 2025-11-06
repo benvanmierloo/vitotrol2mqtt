@@ -1,6 +1,6 @@
 FROM golang:1.21.1 AS builder
 
-RUN CGO_ENABLED=0 GOOS=linux go install github.com/benvanmierloo/vitotrol2mqtt@latest
+RUN CGO_ENABLED=0 GOOS=linux go install github.com/benvanmierloo/vitotrol2mqtt@master
 RUN CGO_ENABLED=0 GOOS=linux go install github.com/benvanmierloo/go-vitotrol/cmd/vitotrol@master
 
 FROM alpine:3.18.3

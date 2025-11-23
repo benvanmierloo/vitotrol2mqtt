@@ -3,7 +3,7 @@ package main
 import (
 	"io/ioutil"
 
-	"github.com/benvanmierloo/go-vitotrol"
+	"github.com/maxatome/go-vitotrol"
 	"gopkg.in/yaml.v2"
 )
 

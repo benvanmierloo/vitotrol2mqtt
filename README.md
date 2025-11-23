@@ -20,7 +20,7 @@ Create a YAML file based on
 credentials and the attributes you want to send to the MQTT broker.
 
 Registered attributes can be found here:
-https://github.com/benvanmierloo/go-vitotrol/blob/master/attributes.go#L79
+https://github.com/maxatome/go-vitotrol/blob/master/attributes.go#L79
 (field `Name`).
 
 Note! Including field mappings that are unsupported by your Viessmann device
@@ -43,7 +43,7 @@ You can see in the LOG File if the set was successfully. You can only change wri
 
 Note! Use `RW` naming only for fields that you have checked to be writable, see below.
 
-You can use [`vitotrol`](https://github.com/benvanmierloo/go-vitotrol) +
+You can use [`vitotrol`](https://github.com/maxatome/go-vitotrol) +
 `rget all`, `bget` or `remote_attrs` actions to discover attributes and their read/write access
 (german language skill needed :) ).
 

@@ -73,3 +73,8 @@ docker-compose up
 
 That's all.
 
+## Support
+
+If you find this project useful, consider buying me a coffee:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-donate-yellow.svg)](https://buymeacoffee.com/benvanmierloo)

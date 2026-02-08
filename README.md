@@ -1,6 +1,9 @@
 
 # Viessmann™ Vitotrol™ device to MQTT
 
+> **This project is deprecated and will no longer be maintained.**
+> Please use [Viessmann Vitotrol for Home Assistant](https://github.com/benvanmierloo/ha-vitotrol), which is the successor to this integration.
+
 Typically used to send Viessmann™ Vitotrol™ boiler data to a MQTT broker
 
 ## Installation
